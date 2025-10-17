@@ -12,8 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CheckSquare, Plus, Clock, CheckCircle2 } from "lucide-react";
+import { CheckSquare, Clock, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
+import { NewComplianceDialog } from "@/components/forms/NewComplianceDialog";
 
 const Compliance = () => {
   const [requirements, setRequirements] = useState<any[]>([]);
@@ -69,10 +70,7 @@ const Compliance = () => {
               PENCOM Regulatory Requirements and Reporting Management
             </p>
           </div>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            New Requirement
-          </Button>
+          <NewComplianceDialog onSuccess={fetchRequirements} />
         </div>
 
         {/* Overview Cards */}

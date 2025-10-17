@@ -12,7 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertTriangle, Plus, TrendingUp } from "lucide-react";
+import { AlertTriangle, TrendingUp } from "lucide-react";
+import { NewRiskDialog } from "@/components/forms/NewRiskDialog";
 
 const Risk = () => {
   const [risks, setRisks] = useState<any[]>([]);
@@ -69,10 +70,7 @@ const Risk = () => {
               Enterprise Risk Register and Control Assurance
             </p>
           </div>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            New Risk
-          </Button>
+          <NewRiskDialog onSuccess={fetchRisks} />
         </div>
 
         {/* Overview Cards */}

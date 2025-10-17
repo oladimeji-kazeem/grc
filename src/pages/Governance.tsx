@@ -12,8 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FileText, Plus, Eye } from "lucide-react";
+import { FileText, Eye } from "lucide-react";
 import { format } from "date-fns";
+import { NewPolicyDialog } from "@/components/forms/NewPolicyDialog";
 
 const Governance = () => {
   const [policies, setPolicies] = useState<any[]>([]);
@@ -60,10 +61,7 @@ const Governance = () => {
               Central Policy Hub and Board Oversight Management
             </p>
           </div>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            New Policy
-          </Button>
+          <NewPolicyDialog onSuccess={fetchPolicies} />
         </div>
 
         {/* Overview Cards */}
