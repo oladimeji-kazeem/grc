@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Governance from "./pages/Governance";
 import Risk from "./pages/Risk";
 import Compliance from "./pages/Compliance";
+import DocumentRepository from "./pages/DocumentRepository";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
