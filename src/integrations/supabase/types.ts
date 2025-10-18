@@ -50,6 +50,56 @@ export type Database = {
         }
         Relationships: []
       }
+      compliance_checklists: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          evidence_url: string | null
+          framework: string
+          id: string
+          requirement_code: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          evidence_url?: string | null
+          framework: string
+          id?: string
+          requirement_code: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          evidence_url?: string | null
+          framework?: string
+          id?: string
+          requirement_code?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_checklists_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compliance_requirements: {
         Row: {
           category: string
@@ -94,6 +144,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      controls: {
+        Row: {
+          category: string
+          control_code: string
+          control_type: string
+          created_at: string
+          description: string | null
+          id: string
+          owner_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          control_code: string
+          control_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          control_code?: string
+          control_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "controls_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       corporate_objectives: {
         Row: {
@@ -364,6 +461,42 @@ export type Database = {
         }
         Relationships: []
       }
+      policy_control_mappings: {
+        Row: {
+          control_id: string
+          created_at: string
+          id: string
+          policy_id: string
+        }
+        Insert: {
+          control_id: string
+          created_at?: string
+          id?: string
+          policy_id: string
+        }
+        Update: {
+          control_id?: string
+          created_at?: string
+          id?: string
+          policy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policy_control_mappings_control_id_fkey"
+            columns: ["control_id"]
+            isOneToOne: false
+            referencedRelation: "controls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policy_control_mappings_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -398,6 +531,56 @@ export type Database = {
             columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      remediation_tasks: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          priority: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          priority?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          priority?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "remediation_tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

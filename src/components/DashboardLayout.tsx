@@ -14,6 +14,7 @@ import {
   FolderOpen,
   Target,
   Settings,
+  FileCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -72,9 +73,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { icon: FileText, label: "Governance", path: "/governance" },
     { icon: AlertTriangle, label: "Risk Management", path: "/risk" },
     { icon: CheckSquare, label: "Compliance", path: "/compliance" },
+    { icon: Shield, label: "Controls", path: "/controls" },
     { icon: FolderOpen, label: "Documents", path: "/documents" },
     { icon: Target, label: "Objectives", path: "/objectives" },
-    { icon: Shield, label: "Audit", path: "/audit" },
+    { icon: FileCheck, label: "Audit", path: "/audit" },
     { icon: Settings, label: "Admin Setup", path: "/admin" },
   ];
 

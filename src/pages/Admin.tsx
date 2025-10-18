@@ -199,6 +199,7 @@ const Admin = () => {
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="departments">Departments</TabsTrigger>
             <TabsTrigger value="roles">User Roles</TabsTrigger>
+            <TabsTrigger value="tasks">Remediation Tasks</TabsTrigger>
             <TabsTrigger value="audit">Audit Trail</TabsTrigger>
           </TabsList>
 
@@ -392,6 +393,39 @@ const Admin = () => {
                         </TableRow>
                       ))
                     )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Remediation Tasks Tab */}
+          <TabsContent value="tasks" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Remediation Tasks</CardTitle>
+                <CardDescription>
+                  Automated task assignments for risk, compliance, and incident remediation
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Entity Type</TableHead>
+                      <TableHead>Assigned To</TableHead>
+                      <TableHead>Priority</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Due Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground">
+                        Task management system ready for automated assignments
+                      </TableCell>
+                    </TableRow>
                   </TableBody>
                 </Table>
               </CardContent>

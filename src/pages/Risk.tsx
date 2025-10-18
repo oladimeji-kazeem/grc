@@ -4,6 +4,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { RiskHeatmap } from "@/components/RiskHeatmap";
 import {
   Table,
   TableBody,
@@ -199,6 +200,8 @@ const Risk = () => {
             </CardContent>
           </Card>
         </div>
+
+        <RiskHeatmap risks={risks} />
 
         {/* Risk Matrix */}
         <Card>

@@ -11,6 +11,7 @@ import Compliance from "./pages/Compliance";
 import DocumentRepository from "./pages/DocumentRepository";
 import Objectives from "./pages/Objectives";
 import Audit from "./pages/Audit";
+import Controls from "./pages/Controls";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/documents" element={<DocumentRepository />} />
           <Route path="/objectives" element={<Objectives />} />
           <Route path="/audit" element={<Audit />} />
+          <Route path="/controls" element={<Controls />} />
           <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

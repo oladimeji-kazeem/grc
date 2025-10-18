@@ -4,6 +4,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -18,10 +19,12 @@ import { NewComplianceDialog } from "@/components/forms/NewComplianceDialog";
 
 const Compliance = () => {
   const [requirements, setRequirements] = useState<any[]>([]);
+  const [checklists, setChecklists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchRequirements();
+    fetchChecklists();
   }, []);
 
   const fetchRequirements = async () => {
@@ -33,6 +36,18 @@ const Compliance = () => {
 
     if (data) setRequirements(data);
     setLoading(false);
+  };
+
+  const fetchChecklists = async () => {
+    const { data } = await supabase
+      .from("compliance_checklists")
+      .select(`
+        *,
+        assignee:profiles(full_name)
+      `)
+      .order("due_date");
+
+    if (data) setChecklists(data);
   };
 
   const getStatusBadge = (status: string) => {
@@ -115,8 +130,14 @@ const Compliance = () => {
           </Card>
         </div>
 
-        {/* Requirements Table */}
-        <Card>
+        <Tabs defaultValue="requirements" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="requirements">Requirements</TabsTrigger>
+            <TabsTrigger value="checklists">Compliance Checklists</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="requirements">
+            <Card>
           <CardHeader>
             <CardTitle>Regulatory Requirements Register</CardTitle>
             <CardDescription>
@@ -182,6 +203,66 @@ const Compliance = () => {
             </Table>
           </CardContent>
         </Card>
+          </TabsContent>
+
+          <TabsContent value="checklists">
+            <Card>
+              <CardHeader>
+                <CardTitle>Compliance Checklists (ISO, GDPR, CBN)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Framework</TableHead>
+                      <TableHead>Requirement Code</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Assigned To</TableHead>
+                      <TableHead>Due Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center">
+                          Loading...
+                        </TableCell>
+                      </TableRow>
+                    ) : checklists.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center">
+                          No checklists found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      checklists.map((checklist) => (
+                        <TableRow key={checklist.id}>
+                          <TableCell>
+                            <Badge variant="outline">{checklist.framework}</Badge>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {checklist.requirement_code}
+                          </TableCell>
+                          <TableCell>{checklist.title}</TableCell>
+                          <TableCell>{getStatusBadge(checklist.status)}</TableCell>
+                          <TableCell>
+                            {checklist.assignee?.full_name || "Unassigned"}
+                          </TableCell>
+                          <TableCell>
+                            {checklist.due_date
+                              ? new Date(checklist.due_date).toLocaleDateString()
+                              : "N/A"}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardLayout>
   );
