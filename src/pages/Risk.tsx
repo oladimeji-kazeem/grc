@@ -294,6 +294,124 @@ const Risk = () => {
             </Table>
           </CardContent>
         </Card>
+
+        {/* Board Risk Committee Report */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-blue-600" />
+              Board Risk Committee Report
+            </CardTitle>
+            <CardDescription>
+              Executive summary for Board Risk Committee oversight and governance
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Total Risks Under Review</p>
+                <p className="text-3xl font-bold">{risks.length}</p>
+                <p className="text-xs text-muted-foreground">
+                  Across all departments and categories
+                </p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Critical & High Risks</p>
+                <p className="text-3xl font-bold text-red-600">{criticalRisks + highRisks}</p>
+                <p className="text-xs text-muted-foreground">
+                  {criticalRisks} critical, {highRisks} high priority
+                </p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Pending Approvals</p>
+                <p className="text-3xl font-bold text-yellow-600">{pendingApproval}</p>
+                <p className="text-xs text-muted-foreground">
+                  Awaiting department head approval
+                </p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Risk Mitigation Rate</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {risks.length > 0
+                    ? Math.round((risks.filter(r => r.status === "mitigating" || r.status === "monitoring" || r.status === "closed").length / risks.length) * 100)
+                    : 0}%
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Risks being actively managed
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-6 border-t">
+              <h4 className="text-sm font-semibold mb-4">Risk Distribution by Category</h4>
+              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+                {["Strategic", "Financial", "Operational", "Compliance", "IT Security", "Investment", "Reputational"].map((category) => {
+                  const categoryRisks = risks.filter(r => r.category === category);
+                  const categoryCount = categoryRisks.length;
+                  const criticalInCategory = categoryRisks.filter(r => r.risk_score >= 15).length;
+                  
+                  return categoryCount > 0 ? (
+                    <div key={category} className="p-3 border rounded-lg bg-muted/30">
+                      <p className="text-sm font-medium">{category}</p>
+                      <p className="text-2xl font-bold mt-1">{categoryCount}</p>
+                      {criticalInCategory > 0 && (
+                        <p className="text-xs text-red-600 mt-1">
+                          {criticalInCategory} critical
+                        </p>
+                      )}
+                    </div>
+                  ) : null;
+                })}
+              </div>
+            </div>
+
+            <div className="mt-6 pt-6 border-t">
+              <h4 className="text-sm font-semibold mb-3">Key Risk Indicators (KRIs)</h4>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className={`h-5 w-5 ${criticalRisks > 0 ? "text-red-600" : "text-green-600"}`} />
+                    <div>
+                      <p className="text-sm font-medium">Critical Risk Threshold</p>
+                      <p className="text-xs text-muted-foreground">Risks with score ≥ 15</p>
+                    </div>
+                  </div>
+                  <Badge className={criticalRisks > 0 ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"}>
+                    {criticalRisks > 0 ? `${criticalRisks} Above Threshold` : "Within Limits"}
+                  </Badge>
+                </div>
+
+                <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Clock className={`h-5 w-5 ${pendingApproval > 5 ? "text-yellow-600" : "text-green-600"}`} />
+                    <div>
+                      <p className="text-sm font-medium">Approval Backlog</p>
+                      <p className="text-xs text-muted-foreground">Risks pending approval</p>
+                    </div>
+                  </div>
+                  <Badge className={pendingApproval > 5 ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}>
+                    {pendingApproval > 5 ? `${pendingApproval} Pending` : "Under Control"}
+                  </Badge>
+                </div>
+
+                <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm font-medium">Risk Management Coverage</p>
+                      <p className="text-xs text-muted-foreground">Risks with mitigation plans</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-blue-100 text-blue-800">
+                    {risks.length > 0
+                      ? `${Math.round((risks.filter(r => r.mitigation_plan).length / risks.length) * 100)}% Coverage`
+                      : "No Data"}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );
