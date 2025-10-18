@@ -73,6 +73,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { icon: CheckSquare, label: "Compliance", path: "/compliance" },
     { icon: FolderOpen, label: "Documents", path: "/documents" },
     { icon: Target, label: "Objectives", path: "/objectives" },
+    { icon: Shield, label: "Audit", path: "/audit" },
   ];
 
   if (!user) return null;
