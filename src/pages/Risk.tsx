@@ -213,26 +213,27 @@ const Risk = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Risk Title</TableHead>
+                  <TableHead>Category</TableHead>
                   <TableHead>Objective</TableHead>
                   <TableHead>Risk Score</TableHead>
                   <TableHead>Risk Level</TableHead>
                   <TableHead>Approval</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Owner</TableHead>
-                  <TableHead>Champion</TableHead>
+                  <TableHead>Department</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center">
+                    <TableCell colSpan={10} className="text-center">
                       Loading risks...
                     </TableCell>
                   </TableRow>
                 ) : risks.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center text-muted-foreground">
+                    <TableCell colSpan={10} className="text-center text-muted-foreground">
                       No risks identified yet. Register your first risk to begin tracking.
                     </TableCell>
                   </TableRow>
@@ -242,6 +243,9 @@ const Risk = () => {
                     return (
                       <TableRow key={risk.id}>
                         <TableCell className="font-medium">{risk.title}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{risk.category}</Badge>
+                        </TableCell>
                         <TableCell className="text-sm">
                           {risk.objective ? (
                             <div>
@@ -261,7 +265,9 @@ const Risk = () => {
                         <TableCell>{getApprovalBadge(risk.approval_status)}</TableCell>
                         <TableCell>{getStatusBadge(risk.status)}</TableCell>
                         <TableCell>{risk.owner?.full_name || "Unassigned"}</TableCell>
-                        <TableCell>{risk.champion?.full_name || "None"}</TableCell>
+                        <TableCell>
+                          {risk.objective?.department || risk.owner?.department || "N/A"}
+                        </TableCell>
                         <TableCell>
                           {risk.approval_status === "pending" && (
                             <div className="flex gap-2">
