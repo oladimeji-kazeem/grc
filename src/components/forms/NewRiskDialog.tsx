@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -36,6 +36,9 @@ const riskSchema = z.object({
   title: z.string().trim().min(3, "Title must be at least 3 characters").max(200, "Title must be less than 200 characters"),
   description: z.string().trim().max(1000, "Description must be less than 1000 characters").optional(),
   category: z.string().min(1, "Category is required"),
+  objective_id: z.string().optional(),
+  owner_id: z.string().min(1, "Risk owner (Department Head) is required"),
+  risk_champion_id: z.string().optional(),
   likelihood: z.number().min(1, "Likelihood must be between 1-5").max(5, "Likelihood must be between 1-5"),
   impact: z.number().min(1, "Impact must be between 1-5").max(5, "Impact must be between 1-5"),
   status: z.enum(["open", "mitigating", "closed", "monitoring"]),
@@ -50,7 +53,31 @@ interface NewRiskDialogProps {
 
 export function NewRiskDialog({ onSuccess }: NewRiskDialogProps) {
   const [open, setOpen] = useState(false);
+  const [objectives, setObjectives] = useState<any[]>([]);
+  const [profiles, setProfiles] = useState<any[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    fetchObjectives();
+    fetchProfiles();
+  }, []);
+
+  const fetchObjectives = async () => {
+    const { data } = await supabase
+      .from("corporate_objectives")
+      .select("id, title, department")
+      .eq("status", "active")
+      .order("title");
+    if (data) setObjectives(data);
+  };
+
+  const fetchProfiles = async () => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("id, full_name, department")
+      .order("full_name");
+    if (data) setProfiles(data);
+  };
 
   const form = useForm<RiskFormValues>({
     resolver: zodResolver(riskSchema),
@@ -58,6 +85,9 @@ export function NewRiskDialog({ onSuccess }: NewRiskDialogProps) {
       title: "",
       description: "",
       category: "",
+      objective_id: "",
+      owner_id: "",
+      risk_champion_id: "",
       likelihood: 3,
       impact: 3,
       status: "open",
@@ -86,13 +116,29 @@ export function NewRiskDialog({ onSuccess }: NewRiskDialogProps) {
         title: data.title,
         description: data.description || null,
         category: data.category,
+        objective_id: data.objective_id || null,
+        owner_id: data.owner_id,
+        risk_champion_id: data.risk_champion_id || user.id,
         likelihood: data.likelihood,
         impact: data.impact,
         risk_score: data.likelihood * data.impact,
         status: data.status,
         mitigation_plan: data.mitigation_plan || null,
-        owner_id: user.id,
+        approval_status: "pending",
       });
+
+      if (!error) {
+        // Notify risk manager and owner
+        await supabase.from("notifications").insert([
+          {
+            user_id: data.owner_id,
+            title: "New Risk Requires Approval",
+            message: `Risk "${data.title}" has been submitted for your approval`,
+            type: "risk_approval",
+            entity_type: "risk",
+          },
+        ]);
+      }
 
       if (error) throw error;
 
@@ -146,6 +192,31 @@ export function NewRiskDialog({ onSuccess }: NewRiskDialogProps) {
 
             <FormField
               control={form.control}
+              name="objective_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Linked Corporate Objective</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select objective (optional)" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {objectives.map((obj) => (
+                        <SelectItem key={obj.id} value={obj.id}>
+                          {obj.title} ({obj.department})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="category"
               render={({ field }) => (
                 <FormItem>
@@ -170,6 +241,58 @@ export function NewRiskDialog({ onSuccess }: NewRiskDialogProps) {
                 </FormItem>
               )}
             />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="owner_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Risk Owner (Department Head) *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select owner" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {profiles.map((profile) => (
+                          <SelectItem key={profile.id} value={profile.id}>
+                            {profile.full_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="risk_champion_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Risk Champion</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select champion (optional)" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {profiles.map((profile) => (
+                          <SelectItem key={profile.id} value={profile.id}>
+                            {profile.full_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <div className="grid grid-cols-3 gap-4">
               <FormField

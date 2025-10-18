@@ -95,6 +95,50 @@ export type Database = {
         }
         Relationships: []
       }
+      corporate_objectives: {
+        Row: {
+          created_at: string
+          department: string
+          description: string | null
+          fiscal_year: string
+          id: string
+          owner_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department: string
+          description?: string | null
+          fiscal_year: string
+          id?: string
+          owner_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          description?: string | null
+          fiscal_year?: string
+          id?: string
+          owner_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corporate_objectives_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           category: string
@@ -193,6 +237,50 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          message: string
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          message: string
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       policies: {
         Row: {
           approval_date: string | null
@@ -267,6 +355,9 @@ export type Database = {
       }
       risks: {
         Row: {
+          approval_status: string
+          approved_at: string | null
+          approved_by: string | null
           category: string
           created_at: string
           description: string | null
@@ -274,13 +365,18 @@ export type Database = {
           impact: number
           likelihood: number
           mitigation_plan: string | null
+          objective_id: string | null
           owner_id: string | null
+          risk_champion_id: string | null
           risk_score: number | null
           status: string
           title: string
           updated_at: string
         }
         Insert: {
+          approval_status?: string
+          approved_at?: string | null
+          approved_by?: string | null
           category: string
           created_at?: string
           description?: string | null
@@ -288,13 +384,18 @@ export type Database = {
           impact: number
           likelihood: number
           mitigation_plan?: string | null
+          objective_id?: string | null
           owner_id?: string | null
+          risk_champion_id?: string | null
           risk_score?: number | null
           status?: string
           title: string
           updated_at?: string
         }
         Update: {
+          approval_status?: string
+          approved_at?: string | null
+          approved_by?: string | null
           category?: string
           created_at?: string
           description?: string | null
@@ -302,13 +403,37 @@ export type Database = {
           impact?: number
           likelihood?: number
           mitigation_plan?: string | null
+          objective_id?: string | null
           owner_id?: string | null
+          risk_champion_id?: string | null
           risk_score?: number | null
           status?: string
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "risks_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risks_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_objectives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risks_risk_champion_id_fkey"
+            columns: ["risk_champion_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

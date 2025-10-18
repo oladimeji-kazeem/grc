@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   FolderOpen,
+  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -71,6 +72,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { icon: AlertTriangle, label: "Risk Management", path: "/risk" },
     { icon: CheckSquare, label: "Compliance", path: "/compliance" },
     { icon: FolderOpen, label: "Documents", path: "/documents" },
+    { icon: Target, label: "Objectives", path: "/objectives" },
   ];
 
   if (!user) return null;
