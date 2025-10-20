@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { NewIncidentDialog } from "@/components/forms/NewIncidentDialog";
+import { TrustLedger } from "@/components/TrustLedger";
 
 const Audit = () => {
   const [risks, setRisks] = useState<any[]>([]);
@@ -378,60 +379,7 @@ const Audit = () => {
 
           {/* Audit Trail Tab */}
           <TabsContent value="audit-trail" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Audit Trail</CardTitle>
-                <CardDescription>
-                  Complete audit log of all GRC activities and changes
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Timestamp</TableHead>
-                      <TableHead>User</TableHead>
-                      <TableHead>Entity Type</TableHead>
-                      <TableHead>Action</TableHead>
-                      <TableHead>Details</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {loading ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center">
-                          Loading audit logs...
-                        </TableCell>
-                      </TableRow>
-                    ) : auditLogs.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground">
-                          No audit logs available
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      auditLogs.map((log) => (
-                        <TableRow key={log.id}>
-                          <TableCell>
-                            {new Date(log.timestamp).toLocaleString()}
-                          </TableCell>
-                          <TableCell>{log.user_email || "System"}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline">{log.entity_type}</Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Badge>{log.action}</Badge>
-                          </TableCell>
-                          <TableCell className="max-w-md truncate">
-                            {log.details ? JSON.stringify(log.details) : "-"}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+            <TrustLedger />
           </TabsContent>
         </Tabs>
 

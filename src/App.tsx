@@ -13,6 +13,7 @@ import Objectives from "./pages/Objectives";
 import Audit from "./pages/Audit";
 import Controls from "./pages/Controls";
 import Admin from "./pages/Admin";
+import CognitiveRiskRadar from "./pages/CognitiveRiskRadar";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/objectives" element={<Objectives />} />
           <Route path="/audit" element={<Audit />} />
           <Route path="/controls" element={<Controls />} />
+          <Route path="/cognitive-radar" element={<CognitiveRiskRadar />} />
           <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

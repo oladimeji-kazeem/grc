@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_recommendations: {
+        Row: {
+          confidence_score: number | null
+          created_at: string | null
+          description: string
+          entity_id: string
+          entity_type: string
+          id: string
+          implemented_at: string | null
+          implemented_by: string | null
+          priority: string | null
+          rationale: string
+          recommendation_type: string
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string | null
+          description: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          implemented_at?: string | null
+          implemented_by?: string | null
+          priority?: string | null
+          rationale: string
+          recommendation_type: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string | null
+          description?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          implemented_at?: string | null
+          implemented_by?: string | null
+          priority?: string | null
+          rationale?: string
+          recommendation_type?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -497,6 +548,57 @@ export type Database = {
           },
         ]
       }
+      predictive_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_type: string
+          confidence_score: number | null
+          created_at: string | null
+          description: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          predicted_date: string | null
+          severity: string
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type: string
+          confidence_score?: number | null
+          created_at?: string | null
+          description?: string | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          predicted_date?: string | null
+          severity: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          description?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          predicted_date?: string | null
+          severity?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -531,6 +633,54 @@ export type Database = {
             columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      regulation_mappings: {
+        Row: {
+          created_at: string | null
+          id: string
+          mapped_at: string | null
+          mapped_by: string | null
+          mapping_confidence: number | null
+          mapping_rationale: string | null
+          policy_id: string | null
+          requirement_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          mapped_at?: string | null
+          mapped_by?: string | null
+          mapping_confidence?: number | null
+          mapping_rationale?: string | null
+          policy_id?: string | null
+          requirement_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          mapped_at?: string | null
+          mapped_by?: string | null
+          mapping_confidence?: number | null
+          mapping_rationale?: string | null
+          policy_id?: string | null
+          requirement_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regulation_mappings_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "policies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "regulation_mappings_requirement_id_fkey"
+            columns: ["requirement_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_requirements"
             referencedColumns: ["id"]
           },
         ]
@@ -581,6 +731,44 @@ export type Database = {
             columns: ["assigned_to"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_factors: {
+        Row: {
+          created_at: string | null
+          factor_name: string
+          factor_value: number
+          id: string
+          risk_id: string
+          updated_at: string | null
+          weight: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          factor_name: string
+          factor_value: number
+          id?: string
+          risk_id: string
+          updated_at?: string | null
+          weight?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          factor_name?: string
+          factor_value?: number
+          id?: string
+          risk_id?: string
+          updated_at?: string | null
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_factors_risk_id_fkey"
+            columns: ["risk_id"]
+            isOneToOne: false
+            referencedRelation: "risks"
             referencedColumns: ["id"]
           },
         ]

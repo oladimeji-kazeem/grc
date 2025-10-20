@@ -13,18 +13,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CheckSquare, Clock, CheckCircle2 } from "lucide-react";
+import { CheckSquare, Clock, CheckCircle2, AlertTriangle, Loader2, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { NewComplianceDialog } from "@/components/forms/NewComplianceDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const Compliance = () => {
   const [requirements, setRequirements] = useState<any[]>([]);
   const [checklists, setChecklists] = useState<any[]>([]);
+  const [predictiveAlerts, setPredictiveAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [generatingPredictions, setGeneratingPredictions] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchRequirements();
     fetchChecklists();
+    fetchPredictiveAlerts();
   }, []);
 
   const fetchRequirements = async () => {
@@ -48,6 +53,62 @@ const Compliance = () => {
       .order("due_date");
 
     if (data) setChecklists(data);
+  };
+
+  const fetchPredictiveAlerts = async () => {
+    const { data } = await supabase
+      .from("predictive_alerts")
+      .select("*")
+      .eq("entity_type", "compliance")
+      .eq("status", "active")
+      .order("predicted_date");
+
+    if (data) setPredictiveAlerts(data);
+  };
+
+  const generatePredictions = async () => {
+    setGeneratingPredictions(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-predictions");
+
+      if (error) throw error;
+
+      toast({
+        title: "Predictions Generated",
+        description: `${data.alerts.length} predictive alerts created`,
+      });
+      fetchPredictiveAlerts();
+    } catch (error) {
+      console.error("Error generating predictions:", error);
+      toast({
+        title: "Generation Failed",
+        description: error instanceof Error ? error.message : "Failed to generate predictions",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingPredictions(false);
+    }
+  };
+
+  const acknowledgeAlert = async (alertId: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    const { error } = await supabase
+      .from("predictive_alerts")
+      .update({
+        status: "acknowledged",
+        acknowledged_by: user?.id,
+        acknowledged_at: new Date().toISOString()
+      })
+      .eq("id", alertId);
+
+    if (!error) {
+      toast({
+        title: "Alert Acknowledged",
+        description: "The predictive alert has been acknowledged",
+      });
+      fetchPredictiveAlerts();
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -134,6 +195,14 @@ const Compliance = () => {
           <TabsList>
             <TabsTrigger value="requirements">Requirements</TabsTrigger>
             <TabsTrigger value="checklists">Compliance Checklists</TabsTrigger>
+            <TabsTrigger value="predictions">
+              Predictive Alerts
+              {predictiveAlerts.length > 0 && (
+                <Badge className="ml-2" variant="destructive">
+                  {predictiveAlerts.length}
+                </Badge>
+              )}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="requirements">
@@ -259,6 +328,84 @@ const Compliance = () => {
                     )}
                   </TableBody>
                 </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="predictions">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      AI Predictive Compliance Alerts
+                    </CardTitle>
+                    <CardDescription>
+                      AI-powered predictions of potential compliance issues
+                    </CardDescription>
+                  </div>
+                  <Button
+                    onClick={generatePredictions}
+                    disabled={generatingPredictions}
+                    size="sm"
+                  >
+                    {generatingPredictions && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Generate Predictions
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {predictiveAlerts.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-8">
+                    No predictive alerts. Click "Generate Predictions" to analyze compliance data.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {predictiveAlerts.map((alert) => (
+                      <div
+                        key={alert.id}
+                        className="p-4 border rounded-lg flex items-start gap-4"
+                      >
+                        <AlertTriangle className={`h-5 w-5 mt-1 ${
+                          alert.severity === "critical" ? "text-red-600" :
+                          alert.severity === "high" ? "text-orange-600" :
+                          alert.severity === "medium" ? "text-yellow-600" :
+                          "text-blue-600"
+                        }`} />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge className={
+                              alert.severity === "critical" ? "bg-red-100 text-red-800" :
+                              alert.severity === "high" ? "bg-orange-100 text-orange-800" :
+                              alert.severity === "medium" ? "bg-yellow-100 text-yellow-800" :
+                              "bg-blue-100 text-blue-800"
+                            }>
+                              {alert.severity}
+                            </Badge>
+                            <Badge variant="outline">
+                              Confidence: {(alert.confidence_score * 100).toFixed(0)}%
+                            </Badge>
+                            {alert.predicted_date && (
+                              <span className="text-sm text-muted-foreground">
+                                Predicted: {new Date(alert.predicted_date).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                          <h4 className="font-semibold mb-1">{alert.title}</h4>
+                          <p className="text-sm text-muted-foreground mb-3">{alert.description}</p>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => acknowledgeAlert(alert.id)}
+                          >
+                            Acknowledge Alert
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

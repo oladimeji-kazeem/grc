@@ -1,1 +1,13 @@
 project_id = "wridtfzliypyefuagvws"
+
+[functions.cognitive-risk-analysis]
+verify_jwt = false
+
+[functions.auto-map-regulations]
+verify_jwt = true
+
+[functions.generate-predictions]
+verify_jwt = false
+
+[functions.ai-recommendations]
+verify_jwt = false

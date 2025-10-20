@@ -12,13 +12,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FileText, Eye } from "lucide-react";
+import { FileText, Eye, Link2, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { NewPolicyDialog } from "@/components/forms/NewPolicyDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const Governance = () => {
   const [policies, setPolicies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mappingPolicy, setMappingPolicy] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchPolicies();
@@ -33,6 +36,31 @@ const Governance = () => {
 
     if (data) setPolicies(data);
     setLoading(false);
+  };
+
+  const autoMapToRegulations = async (policyId: string) => {
+    setMappingPolicy(policyId);
+    try {
+      const { data, error } = await supabase.functions.invoke("auto-map-regulations", {
+        body: { policyId }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Auto-Mapping Complete",
+        description: `${data.mappings.length} regulation mappings created`,
+      });
+    } catch (error) {
+      console.error("Error auto-mapping:", error);
+      toast({
+        title: "Mapping Failed",
+        description: error instanceof Error ? error.message : "Failed to auto-map regulations",
+        variant: "destructive",
+      });
+    } finally {
+      setMappingPolicy(null);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -123,13 +151,13 @@ const Governance = () => {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center">
+                    <TableCell colSpan={8} className="text-center">
                       Loading policies...
                     </TableCell>
                   </TableRow>
                 ) : policies.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">
                       No policies found. Create your first policy to get started.
                     </TableCell>
                   </TableRow>
@@ -147,9 +175,23 @@ const Governance = () => {
                           : "Not set"}
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => autoMapToRegulations(policy.id)}
+                            disabled={mappingPolicy === policy.id}
+                          >
+                            {mappingPolicy === policy.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Link2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
